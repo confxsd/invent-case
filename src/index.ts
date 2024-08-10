@@ -1,8 +1,9 @@
-import express, { Express, Request, Response, NextFunction } from "express";
+import { AppDataSource } from "@/data-source";
+import bookRoutes from "@/routes/bookRoutes";
+import userRoutes from "@/routes/userRoutes";
 import dotenv from "dotenv";
+import express, { Express, NextFunction, Request, Response } from "express";
 import "reflect-metadata";
-import { AppDataSource } from "./data-source";
-import { User } from "./entities/User";
 
 dotenv.config();
 
@@ -14,31 +15,18 @@ app.use(express.json());
 AppDataSource.initialize()
   .then(() => {
     console.log("Data Source has been initialized!");
+
+    // const queryRunner = AppDataSource.createQueryRunner();
+
+    // console.log("Dropping all tables...");
+    // queryRunner.clearDatabase();
   })
   .catch((error) => {
     console.error("Error during Data Source initialization:", error);
   });
 
-app.get("/", async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const userRepository = AppDataSource.getRepository(User);
-    const users = await userRepository.find();
-    res.json(users);
-  } catch (error) {
-    next(error);
-  }
-});
-
-app.post("/users", async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const userRepository = AppDataSource.getRepository(User);
-    const newUser = userRepository.create(req.body);
-    const savedUser = await userRepository.save(newUser);
-    res.status(201).json(savedUser);
-  } catch (error) {
-    next(error);
-  }
-});
+app.use("/users", userRoutes);
+app.use("/books", bookRoutes);
 
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);
