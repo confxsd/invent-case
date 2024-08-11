@@ -1,18 +1,16 @@
-import { Book, Borrow, User } from "@/entities";
-import dotenv from "dotenv";
 import "reflect-metadata";
 import { DataSource } from "typeorm";
-
-dotenv.config();
+import { Book, Borrow, User } from "@/entities";
+import { config } from "@/config";
 
 export const AppDataSource = new DataSource({
-  type: "postgres",
-  host: process.env.DB_HOST,
-  port: Number(process.env.DB_PORT),
-  username: process.env.DB_USERNAME,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_DATABASE,
+  type: config.db.type as any,
+  host: config.db.host,
+  port: config.db.port,
+  username: config.db.username,
+  password: config.db.password,
+  database: config.db.database,
   entities: [User, Borrow, Book],
-  synchronize: true,
-  logging: false,
+  synchronize: config.db.synchronize,
+  logging: config.db.logging,
 });

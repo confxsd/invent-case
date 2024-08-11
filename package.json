@@ -6,7 +6,14 @@
   "scripts": {
     "build": "npx tsc",
     "dev": "nodemon",
-    "start": "node -r module-alias/register dist/index.js"
+    "start": "node -r module-alias/register dist/index.js",
+    "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
+    "migration:generate": "npx ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate src/migrations/schema -d src/data-source.ts",
+    "migration:run": "npm run typeorm -- migration:run -d src/data-source.ts",
+    "migration:revert": "npm run typeorm -- migration:revert -d src/data-source.ts",
+    "migration:show": "npm run typeorm -- migration:show -d src/data-source.ts",
+    "migration:create": "npm run typeorm -- migration:create src/migrations",
+    "migration:drop": "npm run typeorm -- schema:drop -d src/data-source.ts"
   },
   "author": "",
   "license": "ISC",

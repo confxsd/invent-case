@@ -17,6 +17,11 @@ export const borrowBookParamsSchema = Joi.object({
   bookId: Joi.number().integer().required(),
 });
 
+export const returnBookParamsSchema = Joi.object({
+  userId: Joi.number().integer().required(),
+  bookId: Joi.number().integer().required(),
+});
+
 export const returnBookSchema = Joi.object({
   score: Joi.number().integer().min(1).max(10).required(),
 });
