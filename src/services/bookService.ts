@@ -1,8 +1,8 @@
-import { AppDataSource } from "@/data-source";
 import { Book } from "@/entities";
-import { BookNotFoundError } from "@/errors";
+import { BookNotFoundError, UpdateBookScoreError } from "@/errors";
 import * as bookRepository from "@/repositories/bookRepository";
 import { BookDetailResponse, BookListResponse } from "@/responses";
+import { QueryRunner } from "typeorm";
 
 export const getAllBooks = async (): Promise<BookListResponse[]> => {
   const books = await bookRepository.getAllBooks();
@@ -20,18 +20,28 @@ export const getBookById = async (id: number): Promise<BookDetailResponse> => {
     throw new BookNotFoundError(id);
   }
 
+  // TODO: ask this
   const score =
-    parseFloat(book.average_score) === 0
-      ? -1
-      : parseFloat(book.average_score).toFixed(2);
+    book.averageScore.toString() === "-1.00" ? -1 : book.averageScore;
 
   return {
-    id: book.book_id,
-    name: book.book_name,
+    id: book.id,
+    name: book.name,
     score,
   };
 };
 
 export const createBook = async (name: string): Promise<Book> => {
   return await bookRepository.createBook(name);
+};
+
+export const updateBookScore = async (
+  bookId: number,
+  queryRunner: QueryRunner,
+): Promise<void> => {
+  try {
+    await bookRepository.updateBookScore(bookId, queryRunner);
+  } catch (error) {
+    throw new UpdateBookScoreError(bookId);
+  }
 };

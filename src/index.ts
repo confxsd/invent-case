@@ -17,9 +17,9 @@ AppDataSource.initialize()
     console.log("Data Source has been initialized!");
 
     // const queryRunner = AppDataSource.createQueryRunner();
-
     // console.log("Dropping all tables...");
     // queryRunner.clearDatabase();
+    // console.log("All tables have been dropped!");
   })
   .catch((error) => {
     console.error("Error during Data Source initialization:", error);

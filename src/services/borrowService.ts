@@ -4,8 +4,10 @@ import {
   BookAlreadyBorrowedError,
   BookNotFoundError,
   BorrowRecordNotFoundError,
+  ReturnBookError,
   UserNotFoundError,
 } from "@/errors";
+import { updateBookScore } from "@/services/bookService";
 import { IsNull } from "typeorm";
 
 export const borrowBook = async (
@@ -51,37 +53,49 @@ export const returnBook = async (
   bookId: number,
   score: number,
 ): Promise<void> => {
-  const userRepository = AppDataSource.getRepository(User);
-  const borrowRepository = AppDataSource.getRepository(Borrow);
-  const bookRepository = AppDataSource.getRepository(Book);
+  const queryRunner = AppDataSource.createQueryRunner();
 
-  const user = await userRepository.findOne({ where: { id: userId } });
-  if (!user) {
-    throw new UserNotFoundError(userId);
+  await queryRunner.connect();
+  await queryRunner.startTransaction();
+
+  try {
+    const userRepository = queryRunner.manager.getRepository(User);
+    const borrowRepository = queryRunner.manager.getRepository(Borrow);
+
+    const user = await userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new UserNotFoundError(userId);
+    }
+
+    const borrow = await borrowRepository.findOne({
+      where: {
+        user: { id: userId },
+        book: { id: bookId },
+        returnDate: IsNull(),
+      },
+      relations: ["book"],
+    });
+
+    if (!borrow) {
+      throw new BorrowRecordNotFoundError(userId, bookId);
+    }
+
+    borrow.returnDate = new Date();
+    borrow.userScore = score;
+
+    await borrowRepository.save(borrow);
+
+    await updateBookScore(bookId, queryRunner);
+
+    await queryRunner.commitTransaction();
+  } catch (error) {
+    await queryRunner.rollbackTransaction();
+
+    console.error("Error returning book:", error);
+    throw new ReturnBookError(userId, bookId);
+  } finally {
+    await queryRunner.release();
   }
-
-  const book = await bookRepository.findOne({ where: { id: bookId } });
-  if (!book) {
-    throw new BookNotFoundError(bookId);
-  }
-
-  const borrow = await borrowRepository.findOne({
-    where: {
-      user: { id: userId },
-      book: { id: bookId },
-      returnDate: IsNull(),
-    },
-    relations: ["book"],
-  });
-
-  if (!borrow) {
-    throw new BorrowRecordNotFoundError(userId, bookId);
-  }
-
-  borrow.returnDate = new Date();
-  borrow.userScore = score;
-
-  await borrowRepository.save(borrow);
 };
 
 export async function getAllBorrows() {

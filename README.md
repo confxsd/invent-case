@@ -28,9 +28,9 @@ The app supports the following operations:
 
 ### Key Modules and Design Decisions
 
-**User**, **Book** and **Borrow** entity models have been used to design the database. **Borrow** model stores the score given by each borrowing.
+**User**, **Book**, and **Borrow** entity models were designed according to the case study requirements. Since book viewing is more frequent than borrowing or returning, I optimized the database by storing the average rating directly in the Book entity. This approach ensures faster access to book information.
 
-In this project, I used the controller, service, and repository pattern to ensure a clean separation of concerns. This structure promotes maintainability, scalability, and robust error management in the application.
+I used the controller, service, and repository pattern to maintain a clean separation of concerns, promoting efficient data handling and easy maintenance.
 
 ### Installation and Running
 

@@ -37,8 +37,8 @@ export const createBook = async (
   next: NextFunction,
 ) => {
   try {
-    const book = await bookService.createBook(req.body.name);
-    res.status(201).json(book);
+    await bookService.createBook(req.body.name);
+    res.status(201).send();
   } catch (error) {
     next(error);
   }

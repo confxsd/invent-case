@@ -2,6 +2,7 @@ import {
   BookAlreadyBorrowedError,
   BookNotFoundError,
   BorrowRecordNotFoundError,
+  UpdateBookScoreError,
   UserNotFoundError,
 } from "@/errors";
 import * as borrowService from "@/services/borrowService";
@@ -66,6 +67,9 @@ export const returnBook = async (
     }
     if (error instanceof BorrowRecordNotFoundError) {
       return res.status(404).json({ message: error.message });
+    }
+    if (error instanceof UpdateBookScoreError) {
+      return res.status(400).json({ message: error.message });
     }
     next(error);
   }

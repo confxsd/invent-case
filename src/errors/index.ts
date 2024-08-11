@@ -27,3 +27,17 @@ export class BorrowRecordNotFoundError extends Error {
     this.name = "BorrowRecordNotFoundError";
   }
 }
+
+export class ReturnBookError extends Error {
+  constructor(userId: number, bookId: number) {
+    super(`Failed to return book with ID ${bookId} for user with ID ${userId}`);
+    this.name = "ReturnBookError";
+  }
+}
+
+export class UpdateBookScoreError extends Error {
+  constructor(bookId: number) {
+    super(`Failed to update score for book with ID ${bookId}`);
+    this.name = "UpdateBookScoreError";
+  }
+}
