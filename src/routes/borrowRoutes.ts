@@ -4,7 +4,7 @@ import {
   borrowBookParamsSchema,
   returnBookParamsSchema,
   returnBookSchema,
-} from "@/schemas/";
+} from "@/validations/";
 import { Router } from "express";
 
 const router = Router({ mergeParams: true });

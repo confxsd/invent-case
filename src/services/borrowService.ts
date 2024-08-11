@@ -5,6 +5,7 @@ import {
   BookNotFoundError,
   BorrowRecordNotFoundError,
   ReturnBookError,
+  UpdateBookScoreError,
   UserNotFoundError,
 } from "@/errors";
 import { updateBookScore } from "@/services/bookService";
@@ -90,6 +91,14 @@ export const returnBook = async (
     await queryRunner.commitTransaction();
   } catch (error) {
     await queryRunner.rollbackTransaction();
+    if (
+      error instanceof BorrowRecordNotFoundError ||
+      error instanceof UserNotFoundError ||
+      error instanceof UpdateBookScoreError ||
+      error instanceof BookNotFoundError
+    ) {
+      throw error;
+    }
 
     console.error("Error returning book:", error);
     throw new ReturnBookError(userId, bookId);

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import * as bookController from "@/controllers/bookController";
 import { validateRequest } from "@/middlewares/validateRequest";
-import { createBookSchema } from "@/schemas";
+import { createBookSchema } from "@/validations";
 
 const router = Router();
 

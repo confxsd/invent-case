@@ -2,6 +2,7 @@ import {
   BookAlreadyBorrowedError,
   BookNotFoundError,
   BorrowRecordNotFoundError,
+  ReturnBookError,
   UpdateBookScoreError,
   UserNotFoundError,
 } from "@/errors";
@@ -58,19 +59,20 @@ export const returnBook = async (
       req.body.score,
     );
     res.status(204).send();
-  } catch (error) {
-    if (error instanceof UserNotFoundError) {
-      return res.status(404).json({ message: error.message });
+  } catch (error: any) {
+    const errorMap = new Map([
+      [UserNotFoundError, 404],
+      [BookNotFoundError, 404],
+      [BorrowRecordNotFoundError, 404],
+      [UpdateBookScoreError, 400],
+      [ReturnBookError, 400],
+    ]);
+
+    const statusCode = errorMap.get(error.constructor);
+    if (statusCode) {
+      return res.status(statusCode).json({ message: error.message });
     }
-    if (error instanceof BookNotFoundError) {
-      return res.status(404).json({ message: error.message });
-    }
-    if (error instanceof BorrowRecordNotFoundError) {
-      return res.status(404).json({ message: error.message });
-    }
-    if (error instanceof UpdateBookScoreError) {
-      return res.status(400).json({ message: error.message });
-    }
+
     next(error);
   }
 };
